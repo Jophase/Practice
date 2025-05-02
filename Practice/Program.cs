@@ -1,66 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Task1
+public class Program
 {
-    class Program
+    static void Main()
     {
-        static void Main(string[] args)
-        {
-            string input = Console.ReadLine();
-            var validationResult = ValidateInput(input);
+        Console.Write("Введите строку: ");
+        string input = Console.ReadLine();
 
-            if (!validationResult.IsValid)
+
+        List<char> invalidChars = new List<char>();
+        foreach (char c in input)
+        {
+            if (c < 'a' || c > 'z')
             {
-                Console.WriteLine($"Ошибка: введены неподходящие символы: {string.Join(", ", validationResult.InvalidChars)}");
+                invalidChars.Add(c);
             }
+        }
+
+
+        if (invalidChars.Count > 0)
+        {
+            Console.WriteLine($"Ошибка: некорректные символы - {string.Join(", ", invalidChars)}");
+            return;
+        }
+
+
+        string result = ProcessString(input);
+        Console.WriteLine("Результат: " + result);
+
+
+        Console.WriteLine("\nПовторение символов:");
+        Dictionary<char, int> counter = new Dictionary<char, int>();
+
+        foreach (char c in result)
+        {
+            if (counter.ContainsKey(c))
+                counter[c]++;
             else
-            {
-                Console.WriteLine(ProcessString(input));
-            }
-            Console.ReadLine();
+                counter[c] = 1;
         }
 
+        List<char> sortedKeys = new List<char>(counter.Keys);
+        sortedKeys.Sort();
 
-        static (bool IsValid, List<char> InvalidChars) ValidateInput(string input)
+        foreach (char key in sortedKeys)
         {
-            List<char> invalidChars = new List<char>();
-
-            foreach (char c in input)
-            {
-                if (c < 'a' || c > 'z')
-                {
-                    invalidChars.Add(c);
-                }
-            }
-
-            return (invalidChars.Count == 0, invalidChars);
+            Console.WriteLine($"{key} = {counter[key]}");
         }
+    }
 
-
-        static string ProcessString(string text)
+    static string ProcessString(string text)
+    {
+        if (text.Length % 2 == 0)
         {
-            if (string.IsNullOrEmpty(text)) return text;
-
-            if (text.Length % 2 == 0)
-            {
-                int half = text.Length / 2;
-                string firstPart = Reverse(text.Substring(0, half));
-                string secondPart = Reverse(text.Substring(half));
-                return firstPart + secondPart;
-            }
-            else
-            {
-                string reversed = Reverse(text);
-                return reversed + text;
-            }
+            int half = text.Length / 2;
+            return Reverse(text.Substring(0, half)) + Reverse(text.Substring(half));
         }
-
-        static string Reverse(string s)
+        else
         {
-            char[] arr = s.ToCharArray();
+            char[] arr = text.ToCharArray();
             Array.Reverse(arr);
-            return new string(arr);
+            return new string(arr) + text;
         }
+    }
+
+    static string Reverse(string s)
+    {
+        char[] arr = s.ToCharArray();
+        Array.Reverse(arr);
+        return new string(arr);
     }
 }
