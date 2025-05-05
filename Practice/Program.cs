@@ -1,74 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class Program
+class Program
 {
     static void Main()
     {
-        Console.Write("Введите строку: ");
+        Console.Write("Ввод: ");
         string input = Console.ReadLine();
 
-
-        List<char> invalidChars = new List<char>();
+        // Проверка символов
+        var err = new List<char>();
         foreach (char c in input)
-        {
-            if (c < 'a' || c > 'z')
-            {
-                invalidChars.Add(c);
-            }
-        }
+            if (c < 'a' || c > 'z') err.Add(c);
 
-
-        if (invalidChars.Count > 0)
+        if (err.Count > 0)
         {
-            Console.WriteLine($"Ошибка: некорректные символы - {string.Join(", ", invalidChars)}");
+            Console.WriteLine($"Ошибка: {string.Join(", ", err)}");
             return;
         }
 
+        // Обработка строки
+        string res = input.Length % 2 == 0
+            ? Reverse(input[..(input.Length / 2)]) + Reverse(input[(input.Length / 2)..])
+            : Reverse(input) + input;
 
-        string result = ProcessString(input);
-        Console.WriteLine("Результат: " + result);
+        Console.WriteLine($"Результат: {res}");
 
+        // Подсчёт символов
+        var counts = new Dictionary<char, int>();
+        foreach (char c in res)
+            counts[c] = counts.ContainsKey(c) ? counts[c] + 1 : 1;
 
-        Console.WriteLine("\nПовторение символов:");
-        Dictionary<char, int> counter = new Dictionary<char, int>();
+        Console.WriteLine("Частота символов:");
+        foreach (var c in counts)
+            Console.WriteLine($"{c.Key}: {c.Value}");
 
-        foreach (char c in result)
+        // Поиск подстроки
+        string max = "";
+        for (int i = 0; i < res.Length; i++)
         {
-            if (counter.ContainsKey(c))
-                counter[c]++;
-            else
-                counter[c] = 1;
+            if (!"aeiouy".Contains(res[i])) continue;
+            for (int j = res.Length - 1; j > i; j--)
+            {
+                if (!"aeiouy".Contains(res[j])) continue;
+                if (j - i + 1 > max.Length)
+                    max = res.Substring(i, j - i + 1);
+                break;
+            }
         }
 
-        List<char> sortedKeys = new List<char>(counter.Keys);
-        sortedKeys.Sort();
-
-        foreach (char key in sortedKeys)
-        {
-            Console.WriteLine($"{key} = {counter[key]}");
-        }
-    }
-
-    static string ProcessString(string text)
-    {
-        if (text.Length % 2 == 0)
-        {
-            int half = text.Length / 2;
-            return Reverse(text.Substring(0, half)) + Reverse(text.Substring(half));
-        }
-        else
-        {
-            char[] arr = text.ToCharArray();
-            Array.Reverse(arr);
-            return new string(arr) + text;
-        }
+        Console.WriteLine(max == "" ? "Нет подстроки" : $"Макс. подстрока: {max}");
     }
 
     static string Reverse(string s)
     {
-        char[] arr = s.ToCharArray();
-        Array.Reverse(arr);
-        return new string(arr);
+        char[] a = s.ToCharArray();
+        Array.Reverse(a);
+        return new string(a);
     }
 }
