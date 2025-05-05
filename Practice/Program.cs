@@ -48,8 +48,17 @@ class Program
                 break;
             }
         }
-
         Console.WriteLine(max == "" ? "Нет подстроки" : $"Макс. подстрока: {max}");
+
+        // Выбор сортировки
+        Console.Write("Выберите сортировку (1 - QuickSort, 2 - TreeSort): ");
+        string sortType = Console.ReadLine();
+
+        string sorted = sortType == "1" ? QuickSort(res) :
+                       sortType == "2" ? TreeSort(res) :
+                       "Неверный выбор";
+
+        Console.WriteLine($"Отсортировано: {sorted}");
     }
 
     static string Reverse(string s)
@@ -57,5 +66,49 @@ class Program
         char[] a = s.ToCharArray();
         Array.Reverse(a);
         return new string(a);
+    }
+
+    // Быстрая сортировка
+    static string QuickSort(string s)
+    {
+        if (s.Length < 2) return s;
+        char pivot = s[s.Length / 2];
+        string left = "", mid = "", right = "";
+        foreach (char c in s)
+        {
+            if (c < pivot) left += c;
+            else if (c > pivot) right += c;
+            else mid += c;
+        }
+        return QuickSort(left) + mid + QuickSort(right);
+    }
+
+    // Сортировка деревом
+    static string TreeSort(string s)
+    {
+        Node root = null;
+        foreach (char c in s)
+            Insert(ref root, c);
+        return Traverse(root);
+    }
+
+    class Node
+    {
+        public char Value;
+        public Node Left, Right;
+        public Node(char v) => Value = v;
+    }
+
+    static void Insert(ref Node node, char c)
+    {
+        if (node == null) node = new Node(c);
+        else if (c <= node.Value) Insert(ref node.Left, c);
+        else Insert(ref node.Right, c);
+    }
+
+    static string Traverse(Node node)
+    {
+        if (node == null) return "";
+        return Traverse(node.Left) + node.Value + Traverse(node.Right);
     }
 }
